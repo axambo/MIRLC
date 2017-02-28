@@ -20,13 +20,13 @@ Drag the `MIRLC.sc` file to the Extensions folder of SuperCollider (suggested to
 Either recompile the class library (`Language>Recompile Class Library`) or restart SuperCollider.
 
 
-Browsing sounds module
+Browsing Sounds Module
 ----
 
 Install Freesound quark, the SuperCollider client for the database of sound samples Freesound.org.
 Make sure you have an Internet connection.
 
-### Examples
+### Code Examples
 
 ```
 // instantiation
@@ -115,6 +115,10 @@ Make sure you have an Internet connection.
 //~mirlc.playsound();
 //~mirlc.playsound(2);
 ```
+
+### Live Performance Examples
+
+* Here you can listen to the [live performance rehearsal for the concert Noiselets 2017](https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal), Freedonia, Barcelona, Spain. Here is the [sound credit list](sound_credits_rehearsal_Noiselets17.md).
 
 
 License
