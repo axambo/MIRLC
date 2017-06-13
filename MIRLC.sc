@@ -23,13 +23,14 @@ MIRLC {
 		indexold = 0;
 
 		Freesound.authType = "token";// default, only needed if you changed it
-		Freesound.token="5a837b803eb5a6da25dd3b42346fd6550080b919";// change it to own token
+		//Freesound.token="<your_api_key>";// change it to own API key token
+		Freesound.token="5a837b803eb5a6da25dd3b42346fd6550080b919";// change it to own API key token
 
-		//todo: add an envelope for fade in & out (transitions)
 		SynthDef(\playbuf_mono_fs, {
-			|bufnum, buf, amp = 1, out = 0, rate = 1, da = 0, loop = 1, trig = 0|
-			var sig;
+			|bufnum, buf, amp = 1, out = 0, rate = 1, da = 0, loop = 1, trig = 0, gate = 1|
+			var sig, env;
 			sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(buf) * rate,  doneAction: da, loop: loop, trigger: trig);
+			//env = EnvGen.kr(Env.asr(20.0,2.0,10.0, 'sine'), gate, doneAction: 2);
 			sig = sig * amp;
 			Out.ar(out, sig!2);
 		}).add;
@@ -38,13 +39,17 @@ MIRLC {
 
 	}
 
-	// SEARCH METHODS OF A SINGLE SOUND OR POOL OF SOUNDS (PUBLIC)
+	// QUERY BY EXAMPLE
+	// SEARCH & FIND METHODS OF A SINGLE SOUND OR POOL OF SOUNDS (PUBLIC)
+	// FUNCTIONS: randomseed, tagseed, getsimilar, getbyfilter
 
+
+	// GET EXAMPLE SEED
 	// This function gets from one to multiple sounds (size) by random, and plays them
-	getsoundbyrandom { |size = 1|
+	randomseed { |size = 1|
 
 		// if ( debugging == True, {postln("Sounds selected by random: " ++ size);} );
-		sndid = rrand (1, 369281); //todo: retrieve the highest # of FS sound dynamically
+		sndid = rrand (1, 394004); //todo: retrieve the highest # of FS sound dynamically
 		FSSound.getSound ( sndid,
 		{ |f|
 
@@ -68,7 +73,7 @@ MIRLC {
 							//if ( (poolsnd.size - poolsizeold - size) < 0 ,
 								{
 									this.getsound(sndid, size);
-									if ( counter < size, { this.getsoundbyrandom(size); } );
+									if ( counter < size, { this.randomseed(size); } );
 								}
 							);
 						}
@@ -76,18 +81,19 @@ MIRLC {
 				},
 			{
 				if ( debugging == True, {"SoundID does not exist".postln;} );
-				this.getsoundbyrandom(size);
+				this.randomseed(size);
 			} );
 		} );
 	}
 
+	// GET EXAMPLE SEED
 	// This function gets from one to a multiple sounds (size) by one defined tag, and plays them
-	getsoundbytag { |tagquery = "noise", size = 1|
+	tagseed { |tag = "noise", size = 1|
 
 		if ( debugging == True, {
 			postln("Sounds selected by tag: " ++ size);
 		});
-		FSSound.textSearch( query: tagquery, filter: "type:wav", params: ('page': 2),
+		FSSound.textSearch( query: tag, filter: "type:wav", params: ('page': 2),
 			action: { |p|
 				size.do { |index|
 					snd = p[index];
@@ -97,10 +103,11 @@ MIRLC {
 		});
 	}
 
+	// GET SIMILAR SOUNDS FROM SEED
 	// This function gets from one to multiple similar sounds (number defined by size) from a target sound, usually the first sound from the dictionary
-	getsoundbysimilarity { |numsnd = 1, size = 1|
+	getsimilar { | size = 1, targetnumsnd = 1 |
 
-		target = poolsnd[numsnd - 1];
+		target = poolsnd[targetnumsnd - 1];
 
 		target.getSimilar(
 			action: { |p|
@@ -115,13 +122,14 @@ MIRLC {
 
 	}
 
-	getsoundbycontent { |numsnd = 1, queryfilter = '.lowlevel.pitch_instantaneous_confidence.mean:[0.8 TO 1]', size = 1 |
+	// GET SIMILAR SOUNDS BY RANGE
+	getbyfilter { |size = 1, targetnumsnd = 1, fx = '.lowlevel.pitch_instantaneous_confidence.mean:[0.8 TO 1]' |
 
-		sndid = poolsnd[numsnd - 1].id;
+		sndid = poolsnd[targetnumsnd - 1].id;
 
 		FSSound.contentSearch(
 			target: sndid,
-			filter: queryfilter,
+			filter: fx,
 			params: ('page':2),
 			action: {|p|
 			size.do { |index|
@@ -134,10 +142,32 @@ MIRLC {
 	}
 
 
-	// RETRIEVAL OF A SINGLE SOUND OR POOL OF SOUNDS (PUBLIC)
+	// QUERY BY CONTENT:
+	// SEARCH & FIND METHODS OF A SINGLE SOUND OR POOL OF SOUNDS (PUBLIC)
+	// FUNCTIONS: contentseed
+
+	contentseed { |size = 1, feature = '.lowlevel.pitch.mean:600', fx = '.lowlevel.pitch_instantaneous_confidence.mean:[0.8 TO 1]' |
+
+		FSSound.contentSearch(
+			target: feature,
+			filter: fx,
+			params: ('page':2),
+			action: {|p|
+			size.do { |index|
+					snd = p[index];
+					snd.name.postln;
+					this.getsound(snd.id, 1); // so that each sound is loaded directly played
+				}
+			}
+		);
+	}
+
+	// RETRIEVAL & PLAY OF A SINGLE SOUND OR POOL OF SOUNDS (PUBLIC)
+	// FUNCTIONS: getsound
 
 	// This function gets either one sound or multiple sounds by ID and plays them
 	// params: id, size
+	// This function can be used as a standalone, and it is also used by randomseed, tagseed, getsimilar, getbyfilter, contentseed
 	getsound { |id = 31362, size = 1|
 
 		FSSound.getSound(id,
@@ -161,10 +191,12 @@ MIRLC {
 
 			if (size == 1) {
 				this.retrievepool(poolsnd, size);
+				this.printfspool;
 			}{ // size > 1
 				if ( (poolsnd.size - poolsizeold) == size, // need to wait until asynchronous call is ready! once all sounds are added in the dictionary, they can be retrieved
 					{
 						this.retrievepool(poolsnd, size);
+						this.printfspool;
 					}
 				);
 			}
@@ -173,13 +205,14 @@ MIRLC {
 
 
 	// OPERATIONS ON LOADED SOUNDS (PUBLIC)
+	// FUNCTIONS: play
 
 	// This function plays the first sound of the class Dictionary collection play(1), otherwise it plays all
 	//TODO: make it play from the beginning, tried startpos, trigger, w/o success
 	play {
 		size = playb.size;
 		size.do( { |index|
-			playb[index].set(\amp, 1);
+			playb[index].set(\gate, 1, \da, 0);
 		});
 	}
 
@@ -188,25 +221,29 @@ MIRLC {
 
 		sequential = True;
 		index = 0;
-
-		this.solo(1);
-		playb[0].set(\loop, 0, \da, 2);
+		playb[index].set(\loop, 0, \da, 2);
 		playb.size.do{ |b|
 			if( b>0,
-				{this.free(b)}
+				{
+					this.free(b);
+				}
 			);
 		};
-		//playb.add (index -> Synth.new(\playbuf_mono_fs, [\buf, buffers[0], \numChannels, buffers[0].numChannels, \bufnum, buffers[0].bufnum, \loop, 0, \da, 2]) );
 		this.sequencemachine(index);
-
 	}
 
 	sequencemachine { |index = 0|
 			playb[index].onFree {
 			if ( (index+1) < buffers.size, {index = index + 1}, {index = 0} );
 			playb.add (index -> Synth.new(\playbuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 0, \da, 2]) );
+			postln("playing: " ++ playb[index]);
+			this.printplayb;
 			indexold = index;
-			if (sequential == True, {this.sequencemachine(index)} );
+			if (sequential == True,
+				{this.sequencemachine(index)},
+				{ // what to do if it is false
+					playb[index].free;
+			} );
 		}
 	}
 
@@ -215,43 +252,15 @@ MIRLC {
 		sequential = False;
 		playb[indexold].onFree {
 
-			buffers.size.do{ |index|
-				playb[index] = Synth.new(\playbuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 1]) ;
-			};
+			poolsizeold = 0;
+			this.retrievepool(poolsnd, poolsnd.size);
+			this.printall;
+
 		}
 	}
 
-		/*buffers.do{ |buf|
-				playb[buf] = Synth.new(\playbuf_mono_fs, [\buf, buf, \numChannels, buf.numChannels, \bufnum, buf.bufnum, \loop, 1]) ;
-			}*/
-
-		/*playb[indexold].onFree {
-			playb.size{|index|
-				playb[index].freeall;
-			}*/
-
-			/*buffers.do{ |buf|
-				playb[buf] = Synth.new(\playbuf_mono_fs, [\buf, buf, \numChannels, buf.numChannels, \bufnum, buf.bufnum, \loop, 1]) ;
-			}
-		}*/
-
-		/*postln(indexold);
-		playb.removeAt(indexold).postln;
-		playb.do{|index|
-			playb.removeAt(index).postln;
-		}*/
-		/*postln(index);
-		this.freeall;
-		playb.do{|index|
-			playb.removeAt(index).postln;
-		}*/
-		//postln("playb.size " ++ playb.size);
-		/*buffers.do{ |buf|
-			playb.add (buf -> Synth.new(\playbuf_mono_fs, [\buf, buf, \numChannels, buf.numChannels, \bufnum, buf.bufnum, \loop, 1]) );
-		}*/
-
-
 	// This function stops the first sound of the class Dictionary collection play(1), otherwise it plays all
+
 	stop {
 		size = playb.size;
 		size.do( { |index|
@@ -259,41 +268,69 @@ MIRLC {
 		});
 	}
 
-	solo { |numsnd=1|
-		playb[numsnd-1].set(\amp, 1);
+	solo { |targetnumsnd=1|
+		playb[targetnumsnd-1].set(\amp, 1);
 	}
 
-	soloall { |numsnd=1|
+	soloall { |targetnumsnd=1|
 		playb.size.do( { |index|
-			if (index == (numsnd-1),
+			if (index == (targetnumsnd-1),
 				{playb[index].set(\amp, 1)},
 				{playb[index].set(\amp, 0)}
 			);
 		});
 	}
 
-	mute { |numsnd=1|
-		playb[numsnd-1].set(\amp, 0);
+	mute { |targetnumsnd=1|
+		playb[targetnumsnd-1].set(\amp, 0);
 	}
 
-	muteall { |numsnd=1|
+	muteall { |targetnumsnd=1|
 		playb.size.do( { |index|
-			if (index == (numsnd-1),
+			if (index == (targetnumsnd-1),
 				{playb[index].set(\amp, 0)},
 				{playb[index].set(\amp, 1)}
 			);
 		});
 	}
 
+	// private function
 	freeall {
 		size = playb.size;
 		size.do( { |index|
 			playb[index].free;
+			//buffers[index]?
+			//poolsnd[index]?
 		});
 	}
 
+	// private function
 	free {|index|
 		playb[index].free;
+	}
+
+
+	// This function retrieves all content-based descriptors listed in the Analysis Descriptor Documentation from the FreeSound API: "https://www.freesound.org/docs/api/analysis_docs.html#analysis-docs"
+	// The result can be filtered using the descriptors request parameter passing a list of comma separated descriptor names chosen from the available descriptors e.g. 'descriptors=lowlevel.mfcc,rhythm.bpm'
+	analyze {|descriptors, action|
+
+		poolsnd.size.do( { |index|
+			poolsnd[index].getAnalysis( descriptors, action, {|val|
+            val.postln;
+		}, true)
+		});
+
+	}
+
+	// This function
+	analyzepitch { |feature = "lowlevel.pitch" |
+
+		poolsnd.size.do( { |index|
+			poolsnd[index].getAnalysis( feature, {|val|
+            val.lowlevel.pitch.mean.postln;
+		}, true)
+		});
+
 	}
 
 	// SINGLE SOUND SEARCH/PLAY METHODS (PRIVATE)
@@ -314,11 +351,13 @@ MIRLC {
 	// MANAGING DICTIONARY OF SOUNDS METHODS (PRIVATE)
 
 	// This function is in charge of the storage of a new group of sounds by managing the right index number when calling the function load() for each new sound from a dictionary of json info and resetting the counter.
-	retrievepool { |dict, numsnds = 1|
+	retrievepool { |dict, targetnumsnds = 1|
 
-		postln("poolsizeold: " ++ poolsizeold);
+			if ( debugging == True, {
+				postln("poolsizeold: " ++ poolsizeold);
+			});
 
-		numsnds.do ({ |index|
+		targetnumsnds.do ({ |index|
 			if ( debugging == True, {
 				postln("index + poolsizeold: " ++ (index + poolsizeold) );
 			});
@@ -326,13 +365,6 @@ MIRLC {
 		});
 		poolsizeold = dict.size;
 		counter = 0;
-	}
-
-	// This function is similar to getsound() but with more than one sound
-	populatepool { |dict, size=1|
-		size.do( { |index|
-			this.getsoundbyrandom(index);
-		} );
 	}
 
 	// VISUALIZATION
@@ -353,10 +385,10 @@ MIRLC {
 		server.plotTree;
 	}
 
-	printpool {
+	printfspool {
 		postln("The size of this dictionary is: " ++ poolsnd.size);
 		poolsnd.size.do ({ |index|
-			postln("[" ++ index ++ "]: " ++ poolsnd[index].name ++ " by " ++ poolsnd[index].username);
+			postln("[" ++ index ++ "]: " ++ "id: " ++ poolsnd[index].id ++ " name: " ++ poolsnd[index].name ++ " by: " ++ poolsnd[index].username ++ " dur: " ++ poolsnd[index].duration);
 		});
 	}
 
@@ -366,135 +398,50 @@ MIRLC {
 		});
 	}
 
+	printbuffers {
+		buffers.size.do ({ |index|
+			postln("[" ++ index ++ "]: " ++ buffers[index]);
+		});
+	}
+
+	printall {
+		postln("FS poolsnd dictionary: ");
+		this.printfspool;
+		postln("buffers buffers dictionary: ");
+		this.printbuffers;
+		postln("synths playb dictionary: ");
+		this.printplayb;
+	}
+
 
 	// :::TO REVISE:::
 
+	//deprecated?
 
 	// RETRIEVAL OF A MULTIPLE SOUNDS (PUBLIC)
-	createpool { |size = 1|
-		counter = size;
-		if (size == 1) {
-			// 1 unic so, crida funcio get ID via metode X, crida funcio carrega so ID
-			this.getsoundbyrandom();
-		}{
-			size.do( { |index|
-			//sndid = rrand (1, 369281); //todo: convert it to a getter/setter
-
-			/*FSSound.getSound(sndid,
-			{ |f|
-				f["name"].postln;
-				dict.add(index + 1 -> f);
-				counter = counter - 1;//todo: counter--;
-				counter.postln;
-				if ( counter == 0, // need to wait until asynchronous call is ready!
-					{ this.retrievepool(poolsnd, poolsnd.size);}
-				);
-			} );*/
-		} );
-		};
-		//change method if required
-	}
-
 
 	// retrieval from one original sound
 	// propagate (meth 2, # sounds = n)
-	propagate { |meth2 = "random", size = 1|
+/*	propagate { |meth2 = "random", size = 1|
 		switch (meth2.postln,
-			"random", { this.getsoundbyrandom(size) },
+			"random", { this.randomseed(size) },
 			"similarity", { boolsimil = 1 }
 		).postln;
-	}
-
-	//deprecated
-	/*pool { |size=1|
-		this.createpool(poolsnd, size);
 	}*/
 
-		// This function plays one sound from the collection, by default the first sound of the class Dictionary is played
-	// by default it loops, alternatively getsound().playsound() should be possible
-	/*playsound {|numsnd = 1|
-		this.retrievepool(poolsnd, numsnd);
-	}*/
-
-
-/*	//todo: add looping for size
-	soundbytag { |tagquery = "tuning", size = 1|
-
-		FSSound.textSearch( query: tagquery, filter: "type:wav", params:('page':2), action:{|p|
-			snd = p[0]; // first result
-			//snd.id.postln;
-			//this.getsound(snd.id);
-			poolsizeold = poolsnd.size;
-			poolsnd.add(0 -> snd);
-			this.retrievepool(poolsnd, poolsnd.size);
-		});
-
-	}*/
-
-/*	getsoundbyquery { |tagquery = "noise", size = 1|
-
-		FSSound.textSearch( query: tagquery, filter: "type:wav", params:('page':2),
-			action:{ |p|
-			snd = p[0]; // first result
-			poolsizeold = poolsnd.size;
-			poolsnd.add(0 -> snd);
-			this.getsound(poolsnd[0].id);
-				if (boolsimil==1, { this.createpool2(poolsnd, size-1) } );
-		});
-	}*/
-
-
-	pick { |size = 1, meth1 = "random", meth2 = "random", tag = "noise"|
+/*	pick { |size = 1, meth1 = "random", meth2 = "random", tag = "noise"|
 
 		switch (meth1.postln,
-			"random", { this.getsoundbyrandom() },
+			"random", { this.randomseed() },
 			"query", { this.getsoundbyquery(tag, size)  }
 		).postln;
 		switch (meth2.postln,
 			"random", { this.createpool(poolsnd, size) },
 			"similarity", { boolsimil = 1 }
 		).postln;
-	}
-
-/*	// sounds stored in dict, method of selection: random / query
-	// dict: where do we store sounds, size: how many sounds do we store
-	// once all sounds are stored (is it possible to store them differently?),
-	// we load them with retrievepool
-	createpool { |dict, size=1|
-		"Pool function, looping!".postln;
-
-/*		counter = size;
-		rndnums = Array.new(size);
-		while (counter > 0,
-			sndid = rrand (1, 369281);
-			FSSound.getSound(sndid, {|f|
-				sound = f;
-				if ( sound.detail == "Not found.",
-					{},
-					{rndnums.add(sndid); counter = counter - 1}
-				);
-			});
-		);*/
-
-		counter = size;
-		//change method if required
-		size.do( { |index|
-			sndid = rrand (1, 369281); //todo: convert it to a getter/setter
-			FSSound.getSound(sndid,
-			{ |f|
-				f["name"].postln;
-				dict.add(index + 1 -> f);
-				counter = counter - 1;//todo: counter--;
-				counter.postln;
-				if ( counter == 0, // need to wait until asynchronous call is ready!
-					{ this.retrievepool(poolsnd, poolsnd.size);}
-				);
-			} );
-		} );
 	}*/
 
-	//todo: merge with createpool and distinguish by method
-	createpool2 { |dict, size=1|
+/*	createpool2 { |dict, size=1|
 		counter = size;
 
 			size.do( { |index|
@@ -513,35 +460,25 @@ MIRLC {
 				} );
 		} );
 
-	}
-
-/*	addsoundstopool { |dict, size=1, id|
-		FSSound.getSound(id,
-		{ |f|
-			dict.add(index -> f);
-		} );
-	}
-
-*/
-
-	//TBDeveloped
-	/*sequence { |dict|
-		dict.size.do ({ |index|
-            this.load(dict[index], dict.size);
-		});
 	}*/
 
 
 }
 
-//todo: output stereo (from mono)
+//todo: list all the descriptors e.g. analyze function
+//todo: in getsound, if I replace poolsnd.size with index in line "if ( (poolsnd.size - poolsizeold) == size" it does not work / sound, why?
+//todo: add an envelope for fade in & out (transitions) playbufmono sythdef
+//todo: implement freeall: free sounds from playb, buffers, poolsnd
+//todo: implement nowplaying: reports what sounds are playing e.g. sequence scenario
 //todo: print authors names of audio clips
 //todo: commute between 2 modes of play: sequence and parallel
 //todo: add loop vs nonloop when playing the sound
-//todo: transitions with envelopes, more methods on synth
+//todo: transitions with envelopes, more methods on synth, should not apply when from parallel to sequence or the other way around
 		//x = Synth(\foobar, [\bufnum, b.bufnum]);
 		//x.set(\speed, 0);    // pause
 		//x.set(\t_trig, 1);   // rewind
 		//x.set(\speed, 1);    // play
-// pick (meth1, #sound = 1)
-// pick().propagate() should be possible
+//todo: rethink the all-purpose functions propagate, pick, createpool2
+      // createpool2: merge with createpool and distinguish by method?
+      // pick (meth1, #sound = 1)
+      // pick().propagate() should be possible
