@@ -52,13 +52,15 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 ### Code Examples
 
 * [Code demo](script_demo_MIRLCRep.md).
-* [Code demo Noiselets (old version of the code)](script_demo_Noiselets.md)
+* [Code demo Noiselets (old version of the code)](script_demo_Noiselets17.md)
 
 ### Live Performance Examples
 
 * [Video demo](https://vimeo.com/249968326).
 * Noiselets 2017 live (coming soon), January 8, 2017 at Freedonia, Barcelona, Spain. Here is the [sound credit list](sound_credits_Noiselets17.md).
 * [Noiselets 2017 rehearsal](https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal). Here is the [sound credit list](sound_credits_rehearsal_Noiselets17.md).
+
+
 License
 ----
 
