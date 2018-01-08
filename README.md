@@ -52,7 +52,7 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 ### Code Examples
 
 * [Code demo](script_demo_MIRLCRep.md).
-* [Code demo Noiselets (old version of the code)](script_demo_Noiselets17.md)
+* [Code demo Noiselets (old version of the code)](script_demo_Noiselets17.md).
 
 ### Live Performance Examples
 

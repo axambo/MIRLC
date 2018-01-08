@@ -3,30 +3,6 @@
 // - path: directory to store downloaded sounds and record the text file with the credits, or change it to "/tmp/"
 // - debugging: True/False
 
-// Overall TODOs:
-// Revise all the prints, remove as much as possible, also what is in debugging
-// rename functions to shorter and more memorable names e.g. random -> rnd; tag -> tag; content -> cnt; getsound -> id; getSimilar -> sim; filter -> fx
-// move this TODOs to another page
-
-//** New functions / states** TODOs:
-//*add combined searches*
-// implement nowplaying: reports what sounds are playing e.g. sequence scenario
-// add loop vs nonloop when playing the sound
-//add a transition mode, e.g., an envelope for fade in & out (transitions) synthsufmono sythdef
-//transitions with envelopes, more methods on synth, should not apply when from parallel to sequence or the other way around
-//x = Synth(\foobar, [\bufnum, b.bufnum]);
-//x.set(\speed, 0);    // pause
-//x.set(\t_trig, 1);   // rewind
-//x.set(\speed, 1);    // play
-// rethink the all-purpose functions propagate, pick, createpool2
-// createpool2: merge with createpool and distinguish by method?
-
-// pick (meth1, #sound = 1)
-// pick().propagate() should be possible
-// add more filters
-// create combination of functions -> query and propagation at the same time
-// align rhythmic sounds to start at the same time, perhaps add a mode?
-// add a way to control the volume of the groups / sounds
 
 MIRLCRep {
 
@@ -58,8 +34,7 @@ MIRLCRep {
         sequential = False;
 
         Freesound.authType = "token"; // default, only needed if you changed it
-        //Freesound.token="<your_api_key>"; // change it to own API key token
-        Freesound.token="5a837b803eb5a6da25dd3b42346fd6550080b919"; // change it to own API key token
+        Freesound.token="<your_api_key>"; // change it to own API key token
 
         date = Date.getDate;
         path = "/Users/annaxambo/Desktop/MIRLC/";
@@ -133,7 +108,6 @@ MIRLCRep {
     //------------------//
     // This function can be used as a standalone public function to get [1..n] sounds by ID, and it is also used as a private function by random, tag, similar, filter, content to get sounds
     // params: id, size
-    //TODO:  if I replace metadata.size with index in line "if ( (metadata.size - poolsizeold) == size" it does not work / sound, why?
     id { |id = 31362, size = 1|
 
         FSSound.getSound(id,
@@ -163,7 +137,6 @@ MIRLCRep {
     // QUERY BY RANDOM
     //------------------//
     // This function gets [1..n] sounds by random, and plays them
-    //TODO: retrieve a new one if the result is unsatisfactory
     random { |size = 1|
 
         // if ( debugging == True, {postln("Sounds selected by random: " ++ size);} );
@@ -210,7 +183,6 @@ MIRLCRep {
     // QUERY BY TAG
     //------------------//
     // This function gets [1..n] sounds by one defined tag, and plays them
-    // TODO: add filter (e.g. wav, aiff, etc) as an argument
     tag { |tag = "noise", size = 1|
 
         if ( debugging == True, {
@@ -231,7 +203,6 @@ MIRLCRep {
     // QUERY BY CONTENT
     //------------------//
     // This function gets [1..n] sounds by one defined feature and fx, and plays them
-    // TODO: create combination of queries, eg. rhythm & pitch
     content { |size = 1, feature = 'dur', fvalue = 1, fx = 'conf', fxvalue = 'hi' |
         var fconcat, fxconcat;
         if (feature != 'id',
@@ -271,7 +242,6 @@ MIRLCRep {
     // SIMILAR SOUNDS
     //------------------//
     // This function gets [1..n] similar sounds from a target sound, usually the first sound from the dictionary
-    // TODO: retrieve a new sound when asking for a similar sound from the same seed (right now it retrieves the exact same sound)
     similar { | targetnumsnd = 0, size = 1 |
 
         target = metadata[targetnumsnd];  // before: metadata[targetnumsnd - 1];
@@ -300,7 +270,6 @@ MIRLCRep {
     // SIMILAR BY RANGE
     //------------------//
     // This function gets [1..n] similar sounds from a target sound filtered by a fx
-    // !TODO: add more usable terms for the fxs used!
     filter { |targetnumsnd = 0, size = 1, fx = 'conf', fxvalue = 'hi' |
 
         var  fxconcat;
@@ -390,7 +359,6 @@ MIRLCRep {
     // PLAY
     //------------------//
     // This function plays the first sound of the class Dictionary collection play(1), otherwise it plays all
-    //!TODO: make it play from the beginning, tried startpos, trigger, w/o success
     play {
         size = synths.size;
         size.do( { |index|
@@ -404,7 +372,6 @@ MIRLCRep {
     // SEQUENCE
     //------------------//
     // This function plays sounds sequentially, one after the other
-    //TODO: start with the timeline position of the first sound (now it restarts from the beginning)
     sequence {
 
         if ( sequential == False,
@@ -483,7 +450,6 @@ MIRLCRep {
     // STOP
     //------------------//
     // This function stops the first sound of the class Dictionary collection play(1), otherwise it plays all
-	//TODO: solve it when sequential = true
     stop {
         size = synths.size;
         size.do( { |index|
@@ -496,8 +462,7 @@ MIRLCRep {
     // SOLO
     //------------------//
     // This function..
-	//TODO: solve it when sequential = true
-    solo { |targetnumsnd=0|
+	  solo { |targetnumsnd=0|
         synths.size.do( { |index|
             if (index == (targetnumsnd), // before: (index == (targetnumsnd-1)
                 {synths[index].set(\amp, 1)},
@@ -510,7 +475,6 @@ MIRLCRep {
     // MUTE
     //------------------//
     // This function..
-	//TODO: solve it when sequential = true
     mute { |targetnumsnd=0|
         synths[targetnumsnd].set(\amp, 0); // before: synths[targetnumsnd-1].set(\amp, 0);
     } //--//
@@ -533,7 +497,6 @@ MIRLCRep {
     // This function...
     // private function
     //TODO: implement freeall: free sounds from synths, buffers, metadata
-	//TODO: solve it when sequential = true
     freeall {
         size = synths.size;
         size.do( { |index|
@@ -577,7 +540,6 @@ MIRLCRep {
     // TRANSLATE TO FS ARGS
     //------------------//
     // This function maps from shorter arguments to the ones expected by the FreeSound quark
-    // TODO: check whether voice / dissonance are implemented in FS
     argstranslate {
         //Features
         translation.add(\pitch -> ".lowlevel.pitch.mean:");
