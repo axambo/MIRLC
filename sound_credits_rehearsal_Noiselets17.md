@@ -1,12 +1,12 @@
 Sound credits of peterMann's Liveset Rehearsal @ Noiselets 2017
 ----
 
-**Audio file**: 
+**Audio file**:
 
 [https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal]
 (https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal)
 
-**Sounds**: 
+**Sounds**:
 
 - [Cell Phone Interference Noise 1.wav by RutgerMuller](https://www.freesound.org/people/RutgerMuller/sounds/50699/)
 - [GSM Noise by Sorcix](https://www.freesound.org/people/Sorcix/sounds/138647/)
@@ -46,4 +46,9 @@ Sound credits of peterMann's Liveset Rehearsal @ Noiselets 2017
 - [Warndo Equals Love Pattern 3.wav by KatHakaku](https://www.freesound.org/people/KatHakaku/sounds/55412/)
 - [Orion Pattern 4.wav by KatHakaku](https://www.freesound.org/people/KatHakaku/sounds/54119/)
 - [Dll 2.wav by KatHakaku](https://www.freesound.org/people/KatHakaku/sounds/40121/)
- 
+
+Extras
+----
+
+* [Script used for the live performance](script_Noiselets.scd)
+* [Version of the code used](https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167)

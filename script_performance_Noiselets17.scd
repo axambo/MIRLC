@@ -1,4 +1,7 @@
 // This is the script used for the live performance presented in the concert Noiselets (8.1.2017) by peterMann (aka Anna Xambó) at Freedonia, Barcelona, Spain.
+// The code used in the concert of Noiselets 2017 corresponds to the following commit hash to GitHub:
+// [https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167](https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167)
+// The code is part of an old version of the MIRLCRep module.
 
 // part 1, interferences
 ~nz = MIRLC.new
