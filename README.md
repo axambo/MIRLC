@@ -9,13 +9,13 @@ SuperCollider extensions for using MIR techniques in live coding.
 Introduction
 ----
 
-This set of SC classes is designed to provide a high-level approach to using MIR techniques in live coding.
+This set of SC classes is designed to provide a high-level approach to using MIR techniques in live coding. This system has been tested with SuperCollider 3.8.
 
 
 Application Start
 ----
 
-Drag the `MIRLC.sc` file (e.g., MIRLCRep.sc) to the Extensions folder of SuperCollider (suggested to create a subfolder with the same name): `/Users/{username}/Library/Application Support/SuperCollider/Extensions` (in Mac)
+Drag the `MIRLC.sc` file to the Extensions folder of SuperCollider (suggested to create a subfolder with the same name): `/Users/{username}/Library/Application Support/SuperCollider/Extensions` (in Mac)
 
 Either recompile the class library (`Language>Recompile Class Library`) or restart SuperCollider.
 
@@ -52,7 +52,7 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 ### Code Examples
 
 * [Code demo](script_demo_MIRLCRep.md).
-* [Code demo Noiselets (old version of the code)](script_demo_Noiselets17.md).
+* [Code demo Noiselets (old version of the code)](script_demo_Noiselets17.md)
 
 ### Live Performance Examples
 
