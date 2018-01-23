@@ -11,7 +11,7 @@ MIRLCRep {
     classvar <>date;
     classvar <>path;
     classvar <>debugging;
-    var metadata, buffers, synths, translation;
+    var metadata, buffers, synths, <translation;
     var snd, preview, buf, target, sequential;
     var poolsizeold, index, indexold, keys, counter, sndid, numsnds, size, rndnums;
     var window, viewoscil;
@@ -206,9 +206,9 @@ MIRLCRep {
     content { |size = 1, feature = 'dur', fvalue = 1, fx = 'conf', fxvalue = 'hi' |
         var fconcat, fxconcat;
         if (feature != 'id',
-            { fconcat = translation[feature.asSymbol]++fvalue; },
-            { fconcat = fvalue });
-        fxconcat = translation[fx.asSymbol] ++ translation[fxvalue];
+          { fconcat = this.gettranslation(feature.asSymbol)++fvalue; },
+          { fconcat = fvalue });
+        fxconcat = this.gettranslation(fx.asSymbol) ++ this.gettranslation(fxvalue);
         FSSound.contentSearch(
             target: fconcat,
             filter: fxconcat,
@@ -273,7 +273,7 @@ MIRLCRep {
     filter { |targetnumsnd = 0, size = 1, fx = 'conf', fxvalue = 'hi' |
 
         var  fxconcat;
-        fxconcat = translation[fx.asSymbol] ++ translation[fxvalue];
+        fxconcat = this.gettranslation(fx.asSymbol) ++ this.gettranslation(fxvalue);
 
         sndid = metadata[targetnumsnd].id; // before: metadata[targetnumsnd - 1].id
 
@@ -573,6 +573,20 @@ MIRLCRep {
 
     } //--//
 
+
+    //------------------//
+    // GET TRANSLATION
+    //------------------//
+    // This function translates a parameter only if it exists in the dictionary translation
+
+    gettranslation{|key|
+    		if (translation.includesKey(key)){
+    			^translation[key];
+    		}{
+    			^key;
+    		}
+
+    	}
 
     //------------------//
     // CMD PERIOD

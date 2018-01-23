@@ -38,6 +38,7 @@
 ~a.content(1, 'dur', 1, 'conf', 'lo')
 ~a.content(2, 'pitch', 100, 'conf', 'lo')
 ~a.content(1, 'key', 'Asharp')
+~a.content(5, '.lowlevel.spectral_complexity.mean:',1, 'conf', '[0 TO 0.3]') // Using directly Essentia's format
 ~b.content(1, 'bpm', 120)
 
 
