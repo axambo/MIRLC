@@ -34,7 +34,7 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 
 * Make sure you have an Internet connection.
 * Make sure you have a [Freesound.org](http://freesound.org) account.
-* Make sure to obtain an [API key](http://www.freesound.org/api/apply/).
+* Make sure to obtain an [API key](https://freesound.org/help/developers/).
 * Install [Freesound quark](https://github.com/g-roma/Freesound.sc), which is a SuperCollider client for accessing the Freesound API and operate with sounds from Freesound.org.
 * In order to connect with Freesound.org, the type of authentication used in MIRLC is Token. Make sure to introduce your API key in the class `MIRLC.sc` and recompile the class library.
 
