@@ -31,8 +31,8 @@
 // GET SOUNDS BY CONTENT & GET SOUNDS BY CONTENT WITH FILTER
 
 // content(size=1, feature = 'dur', fvalue = 1, fx = 'conf', fxvalue = 'hi')
-~a.content // sounds of 1 sec of duration with high confidence
-~a.content(1, 10, 'dur') // sounds of 10 sec of duration with high confidence
+~a.content // sounds of 1 sec of duration
+~a.content(1, 'dur', 10) // sounds of 10 sec of duration
 ~a.content(1, 'dur', 1, 'key', 'A')
 ~a.content(1, 'dur', 4, 'scale', 'minor')
 ~a.content(1, 'dur', 1, 'conf', 'lo')

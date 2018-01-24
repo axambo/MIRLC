@@ -203,7 +203,7 @@ MIRLCRep {
     // QUERY BY CONTENT
     //------------------//
     // This function gets [1..n] sounds by one defined feature and fx, and plays them
-    content { |size = 1, feature = 'dur', fvalue = 1, fx = 'conf', fxvalue = 'hi' |
+    content { |size = 1, feature = 'dur', fvalue = 1, fx = 'conf', fxvalue = 'bypass' |
         var fconcat, fxconcat;
         if (feature != 'id',
           { fconcat = this.gettranslation(feature.asSymbol)++fvalue; },
@@ -270,7 +270,7 @@ MIRLCRep {
     // SIMILAR BY RANGE
     //------------------//
     // This function gets [1..n] similar sounds from a target sound filtered by a fx
-    filter { |targetnumsnd = 0, size = 1, fx = 'conf', fxvalue = 'hi' |
+    filter { |targetnumsnd = 0, size = 1, fx = 'conf', fxvalue = 'bypass' |
 
         var  fxconcat;
         fxconcat = this.gettranslation(fx.asSymbol) ++ this.gettranslation(fxvalue);
@@ -565,6 +565,7 @@ MIRLCRep {
         translation.add(\minor -> "\"minor\"".asString);
         translation.add(\hi -> "[0.8 TO 1]");
         translation.add(\lo -> "[0 TO 0.2]");
+        translation.add(\bypass -> "[0 TO 1]");
         translation.add(\1720 -> "[17 TO 20]");
         translation.add(\2040 -> "[20 TO 40]");
         translation.add(\neg -> "[-1124 TO -1121]");
