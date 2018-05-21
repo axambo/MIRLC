@@ -9,21 +9,15 @@ SuperCollider extensions for using MIR techniques in live coding.
 Introduction
 ----
 
-This set of SC classes is designed to provide a high-level approach to using MIR techniques in live coding. This system has been tested with SuperCollider 3.8.
+This set of SC classes is designed to provide a high-level approach to using MIR techniques in live coding. This system has been tested with SuperCollider 3.8 and SuperCollider 3.9.
 
 
 Application Start
 ----
 
-Drag the `MIRLC.sc` file to the Extensions folder of SuperCollider (suggested to create a subfolder with the same name): `/Users/{username}/Library/Application Support/SuperCollider/Extensions` (in Mac)
+Drag the MIRLC files (`MIRLCRep.sc`, `MIRLCRew.sc`) to the Extensions folder of SuperCollider (suggested to create a subfolder with the same name): `/Users/{username}/Library/Application Support/SuperCollider/Extensions` (in Mac)
 
 Either recompile the class library (`Language>Recompile Class Library`) or restart SuperCollider.
-
-Version History
-----
-
-The code used in the concert of Noiselets 2017 corresponds to the following commit hash to GitHub: [https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167](https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167)
-
 
 MIRLCRep Module
 ----
@@ -36,7 +30,7 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 * Make sure you have a [Freesound.org](http://freesound.org) account.
 * Make sure to obtain an [API key](https://freesound.org/help/developers/).
 * Install [Freesound quark](https://github.com/g-roma/Freesound.sc), which is a SuperCollider client for accessing the Freesound API and operate with sounds from Freesound.org.
-* In order to connect with Freesound.org, the type of authentication used in MIRLC is Token. Make sure to introduce your API key in the class `MIRLC.sc` and recompile the class library.
+* In order to connect with Freesound.org, the type of authentication used in MIRLC is Token. Make sure to introduce your API key in the class `MIRLCRep.sc` and recompile the class library.
 
 ### Additions to the Freesound quark
 
@@ -59,6 +53,25 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 * [Video demo](https://vimeo.com/249968326).
 * Noiselets 2017 live (coming soon), January 8, 2017 at Freedonia, Barcelona, Spain. Here is the [sound credit list](sound_credits_Noiselets17.md).
 * [Noiselets 2017 rehearsal](https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal). Here is the [sound credit list](sound_credits_rehearsal_Noiselets17.md).
+
+MIRLCRew Module
+----
+
+The MIRLCRew class is designed for rewiring an audio in signal as both a control signal or audio signal using MIR techniques in SuperCollider.
+
+### Requirements
+
+* Make sure you have either a microphone connected or audio files.
+
+### Code Examples
+
+* [Code demo](script_demo_MIRLCRew.md).
+
+
+Version History
+----
+
+The code used in the concert of Noiselets 2017 corresponds to the following commit hash to GitHub: [https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167](https://github.com/axambo/MIRLC/commit/3d0d27a0d1098b34694d7ef29439dac7443d5167)
 
 
 License
