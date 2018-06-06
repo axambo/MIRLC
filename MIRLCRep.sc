@@ -9,18 +9,20 @@ MIRLCRep {
     classvar <>server;
     classvar <>file;
     classvar <>date;
-    classvar <>path;
     classvar <>debugging;
     var metadata, buffers, synths, <translation;
     var snd, preview, buf, target, sequential;
     var poolsizeold, index, indexold, keys, counter, sndid, numsnds, size, rndnums;
     var window, viewoscil;
+    var backendClass;
+    var databaseSize;
+    var directoryPath;
 
-    *new {
-        ^super.new.init
+    *new {|backend = 0, dbSize = 394004, path = "~/Music/MIRLC/"|
+        ^super.new.init(backend, dbSize, path)
     }
 
-    init {
+    init {|backend, dbSize, path|
         server = Server.local;
         server.boot;
         metadata = Dictionary.new;
@@ -32,12 +34,19 @@ MIRLCRep {
         counter = 0;
         indexold = 0;
         sequential = False;
+        databaseSize = dbSize;
+        directoryPath = path;
 
-        Freesound.authType = "token"; // default, only needed if you changed it
-        Freesound.token="<your_api_key>"; // change it to own API key token
+        if(backend == 0){
+            backendClass = FSSound;
+            Freesound.authType = "token"; // default, only needed if you changed it
+            Freesound.token="<your_api_key>"; // change it to own API key token
+        }{
+            backendClass = FLSound;
+        };
 
         date = Date.getDate;
-        path = "/Users/annaxambo/Desktop/MIRLC/";
+
         file = File(path ++ date.stamp ++ "_credits" ++ ".txt","w");
         file.write("Sound samples used:\n");
 
@@ -82,8 +91,8 @@ MIRLCRep {
     //------------------//
     // This function parses the Freesound information of each sound and converts it to the SuperCollider language, storing all the info in two dictionaries (buffers and Synths). The result is a sound that plays once is correctly stored in the synths dictionary.
     loadsounds { |dict, index|
-        dict[index].retrievePreview(path, {
-            buf = Buffer.readChannel(server, path ++ dict[index].previewFilename,
+        dict[index].retrievePreview(directoryPath, {
+            buf = Buffer.readChannel(server, directoryPath ++ dict[index].previewFilename,
                 channels: [0],
                 action: { |buf|
                     if (sequential == False,
@@ -110,7 +119,7 @@ MIRLCRep {
     // params: id, size
     id { |id = 31362, size = 1|
 
-        FSSound.getSound(id,
+        backendClass.getSound(id,
             { |f|
                 //available metadata: "id","url","name","tags","description","geotag","created","license","type","channels","filesize""bitrate","bitdepth","duration","samplerate","username","Jovica","pack","pack_name","download","bookmark","previews","preview-lq-mp3","preview-hq-ogg","preview-hq-mp3","images","num_downloads","avg_rating","num_ratings","rate":,"comments","num_comments","comment","similar_sounds","analysis","analysis_frames","analysis_stats"
                 snd = f;
@@ -140,8 +149,8 @@ MIRLCRep {
     random { |size = 1|
 
         // if ( debugging == True, {postln("Sounds selected by random: " ++ size);} );
-        sndid = rrand (1, 394004); //todo: retrieve the highest # of FS sound dynamically
-        FSSound.getSound ( sndid,
+        sndid = rrand (1, databaseSize); //todo: retrieve the highest # of FS sound dynamically
+        backendClass.getSound ( sndid,
             { |f|
 
                 snd = f;
@@ -188,7 +197,7 @@ MIRLCRep {
         if ( debugging == True, {
             postln("Sounds selected by tag: " ++ size);
         });
-        FSSound.textSearch( query: tag, params: ('page': 1),
+        backendClass.textSearch( query: tag, params: ('page': 1),
             action: { |p|
                 size.do { |index|
                     snd = p[index];
@@ -209,7 +218,7 @@ MIRLCRep {
           { fconcat = this.gettranslation(feature.asSymbol)++fvalue; },
           { fconcat = fvalue });
         fxconcat = this.gettranslation(fx.asSymbol) ++ this.gettranslation(fxvalue);
-        FSSound.contentSearch(
+        backendClass.contentSearch(
             target: fconcat,
             filter: fxconcat,
             params: ('page':1),
@@ -277,7 +286,7 @@ MIRLCRep {
 
         sndid = metadata[targetnumsnd].id; // before: metadata[targetnumsnd - 1].id
 
-        FSSound.contentSearch(
+        backendClass.contentSearch(
             target: sndid,
             filter: fxconcat,
             params: ('page':1),
