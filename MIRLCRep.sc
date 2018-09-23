@@ -382,12 +382,13 @@ MIRLCRep {
     //------------------//
     // This function plays sounds sequentially, one after the other
     sequence {
-
-        if ( sequential == False,
-            { // first time as sequence
-                "--- sequence mode".postln;
-                sequential = True;
-                index = 0;
+        "--- sequence mode".postln;
+		if ( sequential == False,
+			{
+				sequential = True;
+				"change behavior from PARALLEL to SEQUENCE".postln;
+				// removing all the sounds except for the first
+				 index = 0;
                 synths.size.do{ |b|
                     if( b>0,
                         {
@@ -398,15 +399,15 @@ MIRLCRep {
                 synths[index].set(\loop, 0, \da, 2);
                 this.printsynth(index);
                 synths[index].onFree {
-                    "--- sequencemachine mode".postln;
-                    this.sequencemachine(index);
+					if ( sequential == True, {
+						"--- sequencemachine mode".postln;
+						this.sequencemachine(index);
+					});
                 };
-            },
-            { // already in sequence
-                // do nothing
-            }
-        );
-
+				//
+		}, {
+				"keep behavior SEQUENCE".postln;
+		});
     } //--//
 
     //------------------//
@@ -421,14 +422,10 @@ MIRLCRep {
         indexold = index;
         synths[index].onFree {
             if (sequential == True,
-                {
-                    this.sequencemachine(index);
-                },
-                { // if parallel becomes true
-                    this.parallelmachine(index);
+            {
+            this.sequencemachine(index);
             } );
-        }
-
+        };
     } //--//
 
     //------------------//
@@ -437,20 +434,39 @@ MIRLCRep {
     // This function plays sounds in parallel, all of them looping at the same time. If it comes from sequential, it will start once the sound that is playing in the sequential state ends.
     parallel {
         "--- parallel mode".postln;
-        if (sequential == False, { // in parallel mode
-            this.play();
-        },  { // coming from sequential
-            sequential = False;
-        });
+			if ( sequential == True,
+			{
+				if ( synths != nil, {
+					synths[0].free;
+					sequential == False;
+					"change behavior from SEQUENCE to PARALLEL".postln;
+					this.parallelmachine;
+				}, {
+					sequential == False;
+					"change behavior from SEQUENCE to PARALLEL".postln;
+					this.parallelmachine;
+				});
+
+		}, {
+				"keep behavior PARALLEL". postln;
+		});
+
+
+		sequential = False;
     }
 
-    parallelmachine { |index|
+	//------------------//
+    // PARALLEL MACHINE (PRIVATE)
+    //------------------//
+    // This function is private and makes sure to play sounds in parallel
+    parallelmachine {
 
         size = buffers.size;
         size.do( { |index|
             synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 1, \da, 0]) );
         });
         this.printsynths;
+		this.play;
 
     } //--//
 
@@ -507,12 +523,9 @@ MIRLCRep {
     // private function
     //TODO: implement freeall: free sounds from synths, buffers, metadata
     freeall {
-        size = synths.size;
-        size.do( { |index|
-            synths[index].free;
-            //buffers[index]?
-            //metadata[index]?
-        });
+      synths.size.do( { |index|
+        synths[index].free;
+      });
     } //--//
 
     // private function

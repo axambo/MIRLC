@@ -2,6 +2,7 @@
 // instantiation
 ~a = MIRLCRep.new
 ~b = MIRLCRep.new
+~c = MIRLCRep.new(path:"/Users/annaxambo/Desktop/MIRLC/")
 
 
 // GET SOUNDS BY TEXT
