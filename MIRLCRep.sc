@@ -47,7 +47,7 @@ MIRLCRep {
 
         date = Date.getDate;
 
-        file = File(path ++ date.stamp ++ "_credits" ++ ".txt","w");
+        file = File(path.standardizePath ++ date.stamp ++ "_credits" ++ ".txt","w");
         file.write("Sound samples used:\n");
 
         SynthDef(\synthsuf_mono_fs, {
