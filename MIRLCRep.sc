@@ -385,7 +385,8 @@ MIRLCRep {
         "--- sequence mode".postln;
 		if ( sequential == False,
 			{
-				sequential = True;
+				"STATE 3: from parallel to sequence".postln; sequential = True;
+				sequential.postln;
 				"change behavior from PARALLEL to SEQUENCE".postln;
 				// removing all the sounds except for the first
 				 index = 0;
@@ -406,6 +407,8 @@ MIRLCRep {
                 };
 				//
 		}, {
+				"STATE 4: from sequence to sequence".postln; sequential.postln;
+				//sequential = True;
 				"keep behavior SEQUENCE".postln;
 		});
     } //--//
@@ -416,13 +419,16 @@ MIRLCRep {
     // This function is private and makes sure to play sounds sequentially
     sequencemachine { |index = 0|
 
-        if ( (index+1) < buffers.size, {index = index + 1}, {index = 0} );
+		if ( (index+1) < buffers.size, {index = index + 1}, {index = 0} );
+		"index value in sequence machine: ".postln;
+		index.postln;
         synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 0, \da, 2]) );
         this.printsynth(index);
-        indexold = index;
+        //indexold = index;
         synths[index].onFree {
             if (sequential == True,
             {
+			"inside recursion".postln;
             this.sequencemachine(index);
             } );
         };
@@ -434,25 +440,30 @@ MIRLCRep {
     // This function plays sounds in parallel, all of them looping at the same time. If it comes from sequential, it will start once the sound that is playing in the sequential state ends.
     parallel {
         "--- parallel mode".postln;
+
 			if ( sequential == True,
 			{
+				"STATE 1: from sequence to parallel".postln; sequential = False;
+				sequential.postln;
 				if ( synths != nil, {
 					synths[0].free;
-					sequential == False;
 					"change behavior from SEQUENCE to PARALLEL".postln;
-					this.parallelmachine;
-				}, {
-					sequential == False;
+					synths[0].onFree {
+						this.parallelmachine;
+					};
+					}, {
+					"not deleting".postln;
 					"change behavior from SEQUENCE to PARALLEL".postln;
 					this.parallelmachine;
 				});
 
 		}, {
+				"STATE 2: from parallel to parallel".postln; sequential.postln;
+				//sequential == False;
 				"keep behavior PARALLEL". postln;
 		});
 
 
-		sequential = False;
     }
 
 	//------------------//
@@ -469,7 +480,6 @@ MIRLCRep {
 		this.play;
 
     } //--//
-
 
     //------------------//
     // STOP
