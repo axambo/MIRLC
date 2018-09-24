@@ -482,6 +482,17 @@ MIRLCRep {
     } //--//
 
     //------------------//
+    // VOLUME
+    //------------------//
+    // This function changes the volume of the whole group from 0 to 1
+    volume {|vol = 0.5|
+        size = synths.size;
+        size.do( { |index|
+            synths[index].set(\amp, vol);
+        });
+    } //--//
+
+    //------------------//
     // STOP
     //------------------//
     // This function stops the first sound of the class Dictionary collection play(1), otherwise it plays all
@@ -492,6 +503,18 @@ MIRLCRep {
         });
     } //--//
 
+    //------------------//
+    // FADE OUT
+    //------------------//
+	// This function fades out all synths with a smooth fade out
+	// TODO: the workflow is unclear when sounds from a group are faded out, and new sounds are added to the group
+    fadeout {
+		sequential = False; // to avoid inconsistencies
+		synths.size.postln;
+		synths.size.do( { |index|
+			synths[index].set(\gate, 0);
+		});
+    } //--//
 
     //------------------//
     // SOLO
