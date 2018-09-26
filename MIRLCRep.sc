@@ -17,6 +17,7 @@ MIRLCRep {
     var backendClass;
     var databaseSize;
     var directoryPath;
+	  var maxvol = 0.1; // audio samples
 
     *new {|backend = 0, dbSize = 394004, path = "~/Music/MIRLC/"|
         ^super.new.init(backend, dbSize, path)
@@ -51,7 +52,7 @@ MIRLCRep {
         file.write("Sound samples used:\n");
 
         SynthDef(\synthsuf_mono_fs, {
-            |bufnum, buf, amp = 1, out = 0, rate = 1, da = 0, loop = 1, trig = 0, gate = 1|
+            |bufnum, buf, amp = 0.1, out = 0, rate = 1, da = 0, loop = 1, trig = 0, gate = 1|
             var sig, env;
             sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(buf) * rate,  doneAction: da, loop: loop, trigger: trig);
             //env = EnvGen.kr(Env.asr(20.0,2.0,10.0, 'sine'), gate, doneAction: 2);
@@ -96,7 +97,7 @@ MIRLCRep {
                 channels: [0],
                 action: { |buf|
                     if (sequential == False,
-                        { synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buf, \numChannels, buf.numChannels, \bufnum, buf.bufnum, \loop, 1]) );
+                        { synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buf, \numChannels, buf.numChannels, \bufnum, buf.bufnum, \loop, 1, \amp, maxvol]) );
                         },
                         {
                             // do nothing if in sequential mode
@@ -371,8 +372,7 @@ MIRLCRep {
     play {
         size = synths.size;
         size.do( { |index|
-            //synths[index].set(\gate, 1, \da, 0);
-            synths[index].set(\amp, 1);
+            synths[index].set(\amp, maxvol);
             this.printsynth(index);
         });
     } //--//
@@ -422,7 +422,7 @@ MIRLCRep {
 		if ( (index+1) < buffers.size, {index = index + 1}, {index = 0} );
 		"index value in sequence machine: ".postln;
 		index.postln;
-        synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 0, \da, 2]) );
+        synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 0, \da, 2, \amp, maxvol]) );
         this.printsynth(index);
         //indexold = index;
         synths[index].onFree {
@@ -445,18 +445,8 @@ MIRLCRep {
 			{
 				"STATE 1: from sequence to parallel".postln; sequential = False;
 				sequential.postln;
-				if ( synths != nil, {
-					synths[0].free;
-					"change behavior from SEQUENCE to PARALLEL".postln;
-					synths[0].onFree {
-						this.parallelmachine;
-					};
-					}, {
-					"not deleting".postln;
-					"change behavior from SEQUENCE to PARALLEL".postln;
-					this.parallelmachine;
-				});
-
+        "change behavior from SEQUENCE to PARALLEL".postln;
+        this.parallelmachine;
 		}, {
 				"STATE 2: from parallel to parallel".postln; sequential.postln;
 				//sequential == False;
@@ -474,7 +464,7 @@ MIRLCRep {
 
         size = buffers.size;
         size.do( { |index|
-            synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 1, \da, 0]) );
+            synths.add (index -> Synth.new(\synthsuf_mono_fs, [\buf, buffers[index], \numChannels, buffers[index].numChannels, \bufnum, buffers[index].bufnum, \loop, 1, \da, 0, \amp, maxvol]) );
         });
         this.printsynths;
 		this.play;
