@@ -203,6 +203,13 @@ MIRLCRep {
                 size.do { |index|
                     snd = p[index];
                     postln("found sound by tag, id: " ++ snd["id"] ++ "name: " ++ snd["name"]);
+                    while (
+                    {this.sndidexist(snd.id) == 1},
+                    {
+                      postln ("repeated sound, getting another sound...");
+                      index = index + 1 + size;
+                      snd = p[index];
+                    });
                     this.id(snd.id, 1); // so that each sound is loaded & directly played
                 }
         });
@@ -513,7 +520,7 @@ MIRLCRep {
 	  solo { |targetnumsnd=0|
         synths.size.do( { |index|
             if (index == (targetnumsnd), // before: (index == (targetnumsnd-1)
-                {synths[index].set(\amp, 1)},
+                {synths[index].set(\amp, maxvol)},
                 {synths[index].set(\amp, 0)}
             );
         });
@@ -589,11 +596,12 @@ MIRLCRep {
         //Features
         translation.add(\pitch -> ".lowlevel.pitch.mean:");
         translation.add(\dur -> ".sfx.duration:");
+        translation.add(\dissonance -> ".lowlevel.dissonance.mean:");
+        translation.add(\bpm -> ".rhythm.bpm:");
         //Filters
         translation.add(\key -> "tonal.key_key:");
         translation.add(\scale -> "tonal.key_scale:");
         translation.add(\conf -> ".lowlevel.pitch_instantaneous_confidence.mean:");
-        translation.add(\bpm -> ".rhythm.bpm:");
         translation.add(\mfcc0 -> "lowlevel.mfcc.mean[0]:");
         translation.add(\mfcc1 -> "lowlevel.mfcc.mean[1]:");
         translation.add(\mfcc4 -> "lowlevel.mfcc.mean[1]:");
