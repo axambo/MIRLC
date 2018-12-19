@@ -1,12 +1,16 @@
 MIRLCRew {
 
     classvar server;
+	var audiosource;
+	var overlaysig;
 	classvar <>mode, <>soundfile; // 0 => audio in; 1 => audio recording
+	var audioout;
+	classvar <counter = 0;
 	var bufferin, bufferbeattrack, bufferonsets, bufferkeytrack;
 	var numspeakers;
-	var audiosource;
 	var osctr;
-	var audioout;
+	var bypasschannel = 100;
+	var miredsound = 0;
 
 	*new {|mod = 0, filename|
 		^super.new.init(mod, filename);
@@ -15,7 +19,7 @@ MIRLCRew {
     //------------------//
     // INIT
     //------------------//
-    init {|mod, filename|
+    init { |mod, filename|
         server = Server.local;
         server.boot;
 
@@ -30,13 +34,14 @@ MIRLCRew {
 			// Load the sound
 			if (soundfile.isNil,
 				{soundfile = Platform.resourceDir +/+ "sounds/a11wlk01.wav";});
-			//soundfile = filename;
 			bufferin = Buffer.read(server, soundfile);
 
 			// Config vars
 			mode = mod;
-			"mode is".postln;
-			mode.postln;
+			if (mode ==0,
+				{"Listening to audio in...".postln},
+				{"Listening to an audio track...".postln}
+			);
 			numspeakers = 2;
 
 			// Synths here
@@ -53,10 +58,11 @@ MIRLCRew {
 				Out.ar(out, sig!numspeakers * amp);
 			}).send(server);
 
-			SynthDef(\onsetsdef, {|out = 0, amp = 0.7, onsets = 1|
+			SynthDef(\onsetsdef, {|out = 0, onsets = 1|
 
 				var sig;
-				var chain, trigger;
+				var chain;
+
 				if (mode == 1, {
 					sig = PlayBuf.ar(1, bufferin, BufRateScale.kr(bufferin), loop: 1);
 				},
@@ -65,7 +71,8 @@ MIRLCRew {
 				});
 				chain = FFT(bufferonsets, sig);
 				onsets = Onsets.kr(chain, 0.5, \complex);
-				SendTrig.kr(onsets).poll(label:\onset);
+				SendTrig.kr(onsets, value: 1).poll(label:\onset);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
@@ -73,6 +80,7 @@ MIRLCRew {
 
 				var sig;
 				var amps;
+
 				if (mode == 1, {
 					sig = PlayBuf.ar(1, bufferin, BufRateScale.kr(bufferin), loop: 1);
 				},
@@ -81,10 +89,11 @@ MIRLCRew {
 				});
 				amps = Amplitude.ar(sig).poll(label:\amp);
 				SendTrig.kr(Dust.kr(20), value:amps);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
-			SynthDef('beattrkdef', { | out = 0, amp = 0.7 |
+			SynthDef(\beattrkdef, { | out = 0, amp = 0.7 |
 
 				var sig;
 				var trackb, trackh, trackq, tempo;
@@ -102,7 +111,8 @@ MIRLCRew {
 
 				beep = PinkNoise.ar(Decay.kr(trackb, 0.05));
 
-				Out.ar(0, beep!numspeakers);
+				Out.ar(out, beep!numspeakers);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
@@ -111,6 +121,7 @@ MIRLCRew {
 
 				var sig;
 				var amp, freq, hasFreq;
+
 				if (mode == 1, {
 					sig = PlayBuf.ar(1, bufferin, BufRateScale.kr(bufferin), loop: 1);
 				},
@@ -120,12 +131,14 @@ MIRLCRew {
 				amp = Amplitude.ar(sig).poll(label:\amp);
 				 #freq, hasFreq = Pitch.kr(sig).poll(label:\pitch);
 				Out.ar(out, LFTri.ar(freq!numspeakers) + sig * amp);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
 			SynthDef(\keydef, {|out = 0, amp = 0.7|
 
-				var sig, chain, key;
+				var sig;
+				var chain, key;
 
 				if (mode == 1, {
 					sig = PlayBuf.ar(1, bufferin, BufRateScale.kr(bufferin), loop: 1);
@@ -137,6 +150,7 @@ MIRLCRew {
 				chain = FFT(bufferkeytrack, sig);
 				key = KeyTrack.kr(chain, 2.0, 0.5).poll;
 				Out.ar(out, sig!numspeakers * amp);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
@@ -160,6 +174,7 @@ MIRLCRew {
 
 				env = EnvGen.kr(envsh, onset, doneAction: 2);
 				Out.ar(out, sig*env!numspeakers * amp);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
@@ -174,6 +189,7 @@ MIRLCRew {
 				env = EnvGen.kr(Env.perc([0.001, 1, 1, -4]), onset, doneAction: 2);
 
 				Out.ar(out, sig*env!numspeakers * amp);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
 
@@ -187,8 +203,17 @@ MIRLCRew {
 				env = EnvGen.kr(Env.perc([0.001, 1, 1, -4]), onset, doneAction: 2);
 
 				Out.ar(out, sig*env!numspeakers * amp);
+				Out.ar(bypasschannel, sig);
 
 			}).send(server);
+
+			SynthDef(\overlaydef, { | in=100, out = 0, amp = 0.7 |
+				var sig;
+				sig = In.ar(in, 1);
+				Out.ar(out, sig!numspeakers * amp);
+			}).send(server);
+
+
 
 		}); // end of waitForBoot()
 	}//--// end of init()
@@ -199,9 +224,46 @@ MIRLCRew {
     // SOURCE
     //------------------//
 	source {
-		audiosource = Synth.new(\sourcedef);
+
+		"Listening to original sound source...".postln;
+		if (audiosource.notNil,
+			{
+
+				miredsound = 0;
+				audiosource.free;
+				audiosource = Synth.new(\sourcedef);
+		},
+			{
+				audiosource = Synth.new(\sourcedef);
+			}
+		);
+
 	} //--//
 
+   //------------------//
+    // OVERLAY
+    //------------------//
+	overlay { |mode = 'on'|
+		if (  miredsound == 0 ,
+			{
+				"Use source to listen to the original source or apply an effect first (e.g. onsets, beats, and so on)".postln;
+			},
+			{
+				case
+				{mode == \off} {
+					"Desactivating overlay of the original source to the audio signal...".postln;
+					if ( overlaysig.notNil,  { overlaysig.free; "bypass sig free".postln } );
+				}
+				{mode == \on} {
+					if (overlaysig.notNil,
+						{overlaysig.free});
+					"Overlaying original source to the audio signal...".postln;
+					overlaysig = Synth.new(\overlaydef, [\in, bypasschannel], addAction:\addToTail);
+				}
+			}
+		);
+
+	} //--//
 
 	//------------------//
     // FREE
@@ -209,6 +271,7 @@ MIRLCRew {
 	free {
 		audiosource.free;
 		audioout.free;
+		osctr.free;
 	} //--//
 
    //------------------//
@@ -221,15 +284,24 @@ MIRLCRew {
     //------------------//
     // ONSETS
     //------------------//
-		onsets { |instr = 'perc', freqin = 90, envshapein = 'normal', freqini = 200, freqend = 2000|
+		onsets { |instr = 'beep', freqin = 90, envshapein = 'normal', freqini = 200, freqend = 2000|
+		miredsound = 1;
+		if (audiosource.notNil,
+				{audiosource.free});
+		if (osctr.notNil,
+				{osctr.free});
+		if (audioout.notNil,
+			{audioout.free});
 		audiosource = Synth.new(\onsetsdef);
 		osctr = OSCFunc({ arg msg, time;
 			msg.postln;
-
+			time.postln;
+			counter = counter + 1;
+			counter.postln;
 			case
 				{instr == \perc} { audioout =  Synth.new(\percdef, [\onset, 1, \freq, freqin]); }
-			{instr == \spark} { audioout =  Synth.new(\sparkdef, [\onset, 1, \freq1, freqini, \freq2, freqend]); }
-			{instr == \beep} { audioout =  Synth.new(\beepdef, [\onset, 1, \freq, freqin]); };
+			    {instr == \spark} { audioout =  Synth.new(\sparkdef, [\onset, 1, \freq1, freqini, \freq2, freqend]); }
+			    {instr == \beep} { audioout =  Synth.new(\beepdef, [\onset, 1, \freq, freqin]); };
 
 		},'/tr', server.addr);
 
@@ -240,6 +312,10 @@ MIRLCRew {
     // BEATS
     //------------------//
 	beats {
+		if (audioout.notNil,
+			{audioout.free});
+		if (audiosource.notNil,
+				{audiosource.free});
 		audioout =  Synth.new(\beattrkdef);
 	} //--//
 
@@ -247,6 +323,10 @@ MIRLCRew {
     // PITCH
     //------------------//
 	pitch {
+		if (audioout.notNil,
+			{audioout.free});
+		if (audiosource.notNil,
+				{audiosource.free});
 		audioout =  Synth.new(\pitchdef);
 	} //--//
 
@@ -254,6 +334,10 @@ MIRLCRew {
     // KEY
     //------------------//
 	key {
+		if (audioout.notNil,
+			{audioout.free});
+		if (audiosource.notNil,
+				{audiosource.free});
 		audioout =  Synth.new(\keydef);
 	} //--//
 
@@ -262,7 +346,13 @@ MIRLCRew {
     //------------------//
 	amps { |instr = 'perc'|
 		var ampin;
-		audioout =  Synth.new(\ampsdef);
+		if (audiosource.notNil,
+			{audiosource.free});
+		if (osctr.notNil,
+			{osctr.free});
+		if (audioout.notNil,
+			{audioout.free});
+		audiosource =  Synth.new(\ampsdef);
 		osctr = OSCFunc({ arg msg, time;
 		ampin = msg[3];
 

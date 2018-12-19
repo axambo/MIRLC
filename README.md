@@ -3,7 +3,7 @@ MIRLC
 ===
 SuperCollider extensions for using MIR techniques in live coding.
 
-(c) 2016-2018 by Anna Xambó (<a.xambo@qmul.ac.uk>).
+(c) 2016-2018 by Anna Xambó (<anna.xambo@ntnu.no>).
 
 
 Introduction
@@ -51,7 +51,7 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 ### Live Performance Examples
 
 * [Video demo](https://vimeo.com/249968326).
-* [The RAW 2018 live](https://soundcloud.com/petermann-plays/live-the-raw-28-11-2018), September 28, 2018 at The RAW / Café 1001 - London, UK. Here is the [sound credit list](sound_credits_TheRAW18.md). 
+* [The RAW 2018 live](https://soundcloud.com/petermann-plays/live-the-raw-28-11-2018), September 28, 2018 at The RAW / Café 1001 - London, UK. Here is the [sound credit list](sound_credits_TheRAW18.md).
 * [Noiselets 2017 live](https://carpal-tunnel.bandcamp.com/track/n02-petermann), January 8, 2017 at Freedonia, Barcelona, Spain. Here is the [sound credit list](sound_credits_Noiselets17.md).
 * [Noiselets 2017 rehearsal](https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal). Here is the [sound credit list](sound_credits_rehearsal_Noiselets17.md).
 
@@ -62,12 +62,19 @@ The MIRLCRew class is designed for rewiring an audio in signal as both a control
 
 ### Requirements
 
-* Make sure you have either a microphone connected or audio files.
+* Make sure you have either a microphone connected or an audio file.
 
 ### Code Examples
 
 * [Code demo](script_demo_MIRLCRew.md).
 
+
+MIRLCRex Module
+----
+
+The MIRLCRex class is designed for supporting the remix of multiple audio streams using MIR techniques in SuperCollider.
+
+Code coming soon.
 
 Version History
 ----
