@@ -63,6 +63,7 @@ The MIRLCRew class is designed for rewiring an audio in signal as both a control
 ### Requirements
 
 * Make sure you have either a microphone connected or an audio file.
+* Input audio files work in mono.
 
 ### Code Examples
 

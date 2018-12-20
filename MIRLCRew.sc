@@ -33,7 +33,10 @@ MIRLCRew {
 			soundfile = filename;
 			// Load the sound
 			if (soundfile.isNil,
-				{soundfile = Platform.resourceDir +/+ "sounds/a11wlk01.wav";});
+				{
+					//soundfile = Platform.resourceDir +/+ "sounds/a11wlk01.wav";
+					soundfile = "/Users/annaxambo/Desktop/MIRLC/128629__bigjoedrummer__afro-beat-6-8-toms-mono.wav";
+			});
 			bufferin = Buffer.read(server, soundfile);
 
 			// Config vars
@@ -312,6 +315,7 @@ MIRLCRew {
     // BEATS
     //------------------//
 	beats {
+		miredsound = 1;
 		if (audioout.notNil,
 			{audioout.free});
 		if (audiosource.notNil,
@@ -323,6 +327,7 @@ MIRLCRew {
     // PITCH
     //------------------//
 	pitch {
+		miredsound = 1;
 		if (audioout.notNil,
 			{audioout.free});
 		if (audiosource.notNil,
@@ -334,6 +339,7 @@ MIRLCRew {
     // KEY
     //------------------//
 	key {
+		miredsound = 1;
 		if (audioout.notNil,
 			{audioout.free});
 		if (audiosource.notNil,
@@ -346,6 +352,7 @@ MIRLCRew {
     //------------------//
 	amps { |instr = 'perc'|
 		var ampin;
+		miredsound = 1;
 		if (audiosource.notNil,
 			{audiosource.free});
 		if (osctr.notNil,
@@ -363,6 +370,7 @@ MIRLCRew {
 
 		},'/tr', server.addr);
 	} //--//
+
 
 }
 	
