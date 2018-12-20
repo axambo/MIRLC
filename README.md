@@ -51,8 +51,8 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 ### Live Performance Examples
 
 * [Video demo](https://vimeo.com/249968326).
-* [The RAW 2018 live](https://soundcloud.com/petermann-plays/live-the-raw-28-11-2018), September 28, 2018 at The RAW / Café 1001 - London, UK. Here is the [sound credit list](sound_credits_TheRAW18.md).
-* [Noiselets 2017 live](https://carpal-tunnel.bandcamp.com/track/n02-petermann), January 8, 2017 at Freedonia, Barcelona, Spain. Here is the [sound credit list](sound_credits_Noiselets17.md).
+* [Live coding @ The RAW and The COOKED, Inter/sections 2018](https://axambo.github.io/music/solo-performances/live-coding-the-raw-2018/). The Raw, Inter/sections 2018. Café 1001. London, UK. September 28, 2018. Here is the [sound credit list](sound_credits_TheRAW18.md).
+* [Live coding @ Noiselets 2017](https://axambo.github.io/music/solo-performances/live-coding-noiselets-2017/). Noiselets – a noise music microfestival. Freedonia, Barcelona, Spain. January 8, 2017. Here is the [sound credit list](sound_credits_Noiselets17.md).
 * [Noiselets 2017 rehearsal](https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal). Here is the [sound credit list](sound_credits_rehearsal_Noiselets17.md).
 
 MIRLCRew Module
@@ -68,6 +68,14 @@ The MIRLCRew class is designed for rewiring an audio in signal as both a control
 ### Code Examples
 
 * [Code demo](script_demo_MIRLCRew.md).
+
+### Live Performance Examples
+
+* [Video demo](https://vimeo.com/249997271).
+* [Beckon @ NIME 2018](http://annaxambo.me/music/group-performances/beckon-nime-2018/). Moss Arts Center: Anne and Ellen Fife Theatre, Blacksburg, VA (USA). June 4, 2018. Here is the [sound credit list](https://github.com/axambo/beacon/blob/master/NIME18-18.06/sound_credits_NIME18.md)
+* [Beacon @ TEI 2018](http://annaxambo.me/music/group-performances/beacon-tei-2018/). Kulturhuset. Stockholm, Sweden. March 20, 2018. Here is the [sound credit list](https://github.com/axambo/beacon/blob/master/TEI18-18.03/sound_credits_TEI18.md).
+* [Beacon @ NIME 2017](http://annaxambo.me/music/group-performances/beacon-nime-2017/). NIME 2017. Stengade. Copenhagen, Denmark. May 16, 2017.  Here is the [sound credit list](https://github.com/axambo/beacon/blob/master/RSF17-17.02/sound_credits_RSF17.md).
+* [Beacon @ Root Signals Festival 2017](http://annaxambo.me/music/group-performances/beacon-root-signals-festival-2017/). Georgia Southern University. Statesboro, Georgia, United States. February 11, 2017. Here is the [sound credit list](https://github.com/axambo/beacon/blob/master/RSF17-17.02/sound_credits_RSF17.md).
 
 
 MIRLCRex Module
