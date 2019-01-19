@@ -56,6 +56,10 @@ The MIRLCRep class is designed for repurposing audio samples from Freesound.org 
 * [Live coding @ Noiselets 2017](https:///music/solo-performances/live-coding-noiselets-2017/). Noiselets – a noise music microfestival. Freedonia, Barcelona, Spain. January 8, 2017. Here is the [script](script_performance_Noiselets17.scd) and the [sound credit list](sound_credits_Noiselets17.md).
 * [Noiselets 2017 rehearsal](https://soundcloud.com/petermann-plays/noiselets-2017-liveset-rehearsal). Here is the [sound credit list](sound_credits_rehearsal_Noiselets17.md).
 
+### Music Album Examples
+
+* Anna Xambó. [H2RI](http://www.panyrosasdiscos.net/pyr247-anna-xambo-h2ri/) (2018). Chicago, IL, USA: pan y rosas.
+
 MIRLCRew Module
 ----
 
@@ -80,7 +84,7 @@ The MIRLCRew class is designed for rewiring an audio in signal as both a control
 
 ### Music Album Examples
 
-* Anna Weisling and Anna Xambó. [Beacon [EP]](https://carpal-tunnel.bandcamp.com/album/beacon). Barcelona: Carpal Tunnel.
+* Anna Weisling and Anna Xambó. [Beacon [EP]](https://carpal-tunnel.bandcamp.com/album/beacon) (2019). Barcelona: Carpal Tunnel.
 
 
 MIRLCRex Module
