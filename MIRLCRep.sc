@@ -17,7 +17,7 @@ MIRLCRep {
     var backendClass;
     var databaseSize;
     var directoryPath;
-	  var maxvol = 0.1; // audio samples
+	  var maxvol = 0.2; // audio samples
 
     *new {|backend = 0, dbSize = 394004, path = "~/Music/MIRLC/"|
         ^super.new.init(backend, dbSize, path)
@@ -33,7 +33,7 @@ MIRLCRep {
         debugging = True;
         poolsizeold = 0;
         counter = 0;
-        indexold = 0;
+        //indexold = 0;
         sequential = False;
         databaseSize = dbSize;
         directoryPath = path;
@@ -52,17 +52,15 @@ MIRLCRep {
         file.write("Sound samples used:\n");
 
         SynthDef(\synthsuf_mono_fs, {
-            |bufnum, buf, amp = 0.1, out = 0, rate = 1, da = 0, loop = 1, trig = 0, gate = 1|
+            |bufnum, buf, amp = 1, out = 0, rate = 1, da = 0, loop = 1, trig = 0, gate = 1|
             var sig, env;
             sig = PlayBuf.ar(1, bufnum, BufRateScale.kr(buf) * rate,  doneAction: da, loop: loop, trigger: trig);
-            //env = EnvGen.kr(Env.asr(20.0,2.0,10.0, 'sine'), gate, doneAction: 2);
+            env = EnvGen.ar(Env.asr(0.1,1,1.0), gate, doneAction:2);
             sig = sig * amp;
             Out.ar(out, sig!2);
         }).add;
 
         this.argstranslate;
-        //this.plotserver; //TODO: revise these functions and perhaps move them to a more meaningful place, it should only print once, it should be a classvar
-        //this.scope;
 
     } //--//
 
@@ -150,7 +148,7 @@ MIRLCRep {
     random { |size = 1|
 
         // if ( debugging == True, {postln("Sounds selected by random: " ++ size);} );
-        sndid = rrand (1, databaseSize); //todo: retrieve the highest # of FS sound dynamically
+        sndid = rrand (1, databaseSize);
         backendClass.getSound ( sndid,
             { |f|
 
@@ -198,22 +196,23 @@ MIRLCRep {
         if ( debugging == True, {
             postln("Sounds selected by tag: " ++ size);
         });
-        backendClass.textSearch( query: tag, params: ('page': 1),
+        backendClass.textSearch(query: tag, params: ('page': 1),
             action: { |p|
                 size.do { |index|
                     snd = p[index];
                     postln("found sound by tag, id: " ++ snd["id"] ++ "name: " ++ snd["name"]);
-                    while (
-                    {this.sndidexist(snd.id) == 1},
-                    {
-                      postln ("repeated sound, getting another sound...");
-                      index = index + 1 + size;
-                      snd = p[index];
-                    });
-                    this.id(snd.id, 1); // so that each sound is loaded & directly played
-                }
-        });
+					while (
+						{this.sndidexist(snd.id) == 1},
+						{
+							postln ("repeated sound, getting another sound...");
+							index = index + 1 + size;
+							snd = p[index];
+					});
+            this.id(snd.id, 1); // so that each sound is loaded & directly played
+            }
+		    });
     } //--//
+
 
 
     //------------------//
@@ -504,8 +503,7 @@ MIRLCRep {
     // FADE OUT
     //------------------//
 	// This function fades out all synths with a smooth fade out
-	// TODO: the workflow is unclear when sounds from a group are faded out, and new sounds are added to the group
-    fadeout {
+	  fadeout {
 		sequential = False; // to avoid inconsistencies
 		synths.size.postln;
 		synths.size.do( { |index|
@@ -538,7 +536,6 @@ MIRLCRep {
     // MUTE ALL
     //------------------//
     // This function..
-	//TODO: solve it when sequential = true
     muteall { |targetnumsnd=0|
         synths.size.do( { |index|
             synths[index].set(\amp, 0);
@@ -551,7 +548,6 @@ MIRLCRep {
     //------------------//
     // This function...
     // private function
-    //TODO: implement freeall: free sounds from synths, buffers, metadata
     freeall {
       synths.size.do( { |index|
         synths[index].free;
@@ -661,7 +657,6 @@ MIRLCRep {
     // SCOPE
     //------------------//
     // This function...
-    //TODO: check this function, not working
     scope {
         /*window = Window.new("MIRLC scope", Rect(200, 200, 1200, 500));
         window.view.decorator = FlowLayout(window.view.bounds);
