@@ -3,13 +3,13 @@ MIRLC
 ===
 SuperCollider extensions for using MIR techniques in live coding.
 
-(c) 2016-2019 by Anna Xambó (<anna.xambo@ntnu.no>).
+(c) 2016-2020 by Anna Xambó (<anna.xambo@dmu.ac.uk>).
 
 
 Introduction
 ----
 
-This set of SC classes is designed to provide a high-level approach to using MIR techniques in live coding. This system has been tested with SuperCollider 3.8 and SuperCollider 3.9.
+This set of SC classes is designed to provide a high-level approach to using MIR techniques in live coding. This system has been tested with SuperCollider 3.8, 3.9 and 3.10.
 
 
 Application Start
@@ -92,7 +92,18 @@ MIRLCRex Module
 
 The MIRLCRex class is designed for supporting the remix of multiple audio streams using MIR techniques in SuperCollider.
 
-Code coming soon.
+### Requirements
+
+* Create a path to the audio streams. The code is based on four audio streams.
+* Input audio files work in mono.
+
+### Code Examples
+
+* [Code demo](script_demo_MIRLCRex.md).
+
+### Live Performance Examples
+
+* [Video demo](https://vimeo.com/249997569).
 
 
 License
